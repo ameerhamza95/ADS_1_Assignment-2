@@ -87,6 +87,93 @@ def world_health_stats(countries, indicators):
     return summary, corr_matrix, cov_matrix, spearman_matrix, kendall_matrix,\
         pearson_matrix
 
+def plot_heatmap(corr_matrix, title='Correlation Heatmap', figsize=(50,50), \
+                 fontsize=16):
+    """
+    Generate a heatmap from a given correlation matrix using seaborn library
+
+    Parameters:
+    corr_matrix (pd.DataFrame): A correlation matrix of indicators
+    title (str): Title for the heatmap (default is 'Correlation Heatmap')
+    figsize (tuple): Figure size of the heatmap (default is (50, 50))
+    fontsize (int): Font size of the labels (default is 16)
+
+    Returns:
+    None
+    """
+
+    # Set style and figure size
+    sns.set(style='white')
+    plt.figure(figsize=figsize)
+
+    # Generate heatmap
+    heatmap = sns.heatmap(corr_matrix, cmap='coolwarm', annot=True, \
+                          fmt='.2f', annot_kws={"size": fontsize-10})
+
+    # Set x and y label font size and rotation
+    plt.xticks(fontsize=fontsize, rotation=90)
+    plt.yticks(fontsize=fontsize)
+
+    # Set colorbar font size
+    cbar = heatmap.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=fontsize+10)
+
+    # Set title and save figure
+    plt.title(title, fontsize=fontsize+30)
+    plt.savefig('heatmap.png', bbox_inches='tight', dpi=300)
+
+    # Show the plot
+    plt.show()
+
+def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
+    """
+    Generate a scatter plot matrix for the specified countries and indicators.
+    
+    Parameters:
+    -----------
+    df_years: pandas.DataFrame
+        Dataframe containing data for multiple years.
+        
+    countries: list
+        List of countries to include in the scatter plot matrix.
+    
+    indicators: list
+        List of indicators to include in the scatter plot matrix.
+    
+    figsize: tuple, optional (default=(15, 15))
+        Size of the figure to be plotted.
+    """
+    
+    # Select data for the specified countries and indicators
+    df_selected_years = df_years.loc[:, (countries, indicators)] 
+
+    # Create scatter plot matrix
+    scatter_matrix = pd.plotting.scatter_matrix(df_selected_years, \
+                                                diagonal='hist', \
+                                                    figsize=figsize)
+
+    # Adjust layout and rotation of xlabels and ylabels
+    for ax in scatter_matrix.ravel():
+        ax.xaxis.label.set_rotation(90)
+        ax.yaxis.label.set_rotation(0)
+        ax.xaxis.label.set_ha('right')
+        ax.yaxis.label.set_ha('right')
+        ax.tick_params(axis='both', which='major', labelsize=10)
+
+    # Adjust spacing between subplots to prevent overlapping axis labels
+    plt.subplots_adjust(wspace=0.2, hspace=0.2)
+    
+    # Set title and save figure
+    fig = plt.gcf()
+    fig.suptitle('Scatter Matrix of China, US and Russia', fontsize=26, y=0.95)
+    plt.savefig('Scatter_Matrix.png', bbox_inches='tight', dpi=300)
+
+    # Improve the layout
+    plt.tight_layout()
+    
+    # Show the plot
+    plt.show()
+
 
 
 
