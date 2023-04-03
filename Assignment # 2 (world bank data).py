@@ -367,6 +367,73 @@ def plot_forest_energy(countries, df_years):
     # show the plot
     plt.show()
 
+def plot_decade_comparison(df, countries, decades):
+    """
+    Plots a bar chart subplot for each decade, showing the mean mortality 
+    rate and mean agriculture value added percentage for each country in 
+    the given list of countries.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the data to be plotted.
+    countries (list): List of countries to include in the plot.
+    decades (list): List of decades to include in the plot.
+
+    Returns:
+    None
+    """
+    # select data for mortality rate under-5 and agriculture value added 
+    # percentage for selected countries
+    df_mortality = df.loc[:, (countries, 'Mortality rate, under-5 \
+                              (per 1,000 live births)')]
+    df_agriculture = df.loc[:, (countries, 'Agriculture, forestry, \
+                                and fishing, value added (% of GDP)')]
+
+    # Drop indicator column header from the dataframes
+    df_mortality.columns = df_mortality.columns.droplevel(1)
+    df_agriculture.columns = df_agriculture.columns.droplevel(1)
+
+    # create a new dataframe with data for each country
+    df_combined = pd.concat([df_mortality, df_agriculture], axis=1, \
+                            keys=['Mortality Rate', 'Agriculture Value Added'])
+
+    # calculate mean values for each decade
+    df_mean = pd.DataFrame()
+    for decade in decades:
+        start_year = int(decade.split('-')[0])
+        end_year = int(decade.split('-')[1])
+        df_decade = df_combined.loc[str(start_year):str(end_year), :]
+        df_mean[decade] = df_decade.mean()
+
+    # create bar subplots for each decade
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(14, 8))
+    axes = axes.flatten()
+    for i, decade in enumerate(decades):
+        ax = axes[i]
+        x = np.arange(len(countries))
+        width = 0.35
+        ax.bar(x - width/2, df_mean.loc['Mortality Rate', decade], \
+               width, label='Mortality Rate')
+        ax.bar(x + width/2, df_mean.loc['Agriculture Value Added', decade], \
+               width, label='Agriculture Value Added')
+        
+        # set titles and labels
+        ax.set_title(decade)
+        ax.set_xlabel('Country', fontsize=10)
+        ax.set_ylabel('Percentage %', fontsize=10)
+        ax.set_xticks(x)
+        ax.set_xticklabels(countries, rotation=0)
+        ax.legend()
+
+    # set overall title and adjust spacing
+    fig.suptitle('Mortality Rate and Agriculture Value Added by Decade', \
+                 fontsize=20)
+    fig.subplots_adjust(hspace=0.3)
+
+    # Save figure
+    plt.savefig('mor_vs_agr_vlue.png', bbox_inches='tight', dpi=300)
+    
+    # show the plot
+    plt.show()
 
 
 
