@@ -51,6 +51,41 @@ def read_world_health_data(filename):
     # Return both dataframes
     return df_years, df_countries
 
+def world_health_stats(countries, indicators):
+    """ This function, world_health_stats, takes in two parameters, countries 
+        and indicators, and performs various statistical calculations on the 
+        world health data.
+    """
+
+    # Subset the data for selected countries and indicators
+    df_selected_years = df_years.loc[:, (countries, indicators)] 
+
+    df_selected_countries = df_countries.loc[(countries, indicators), :]
+
+    # Calculate summary statistics for each indicator
+    summary = df_selected_years.describe()
+
+    # Calculate correlation matrix
+    corr_matrix = df_selected_years.corr()
+
+    # Calculate covariance matrix
+    cov_matrix = df_selected_years.cov()
+
+    # Calculate Spearman's rank correlation coefficient matrix
+    spearman_matrix = df_selected_years.corr(method='spearman')
+
+    # Calculate Kendall's rank correlation coefficient matrix
+    kendall_matrix = df_selected_years.corr(method='kendall')
+
+    # Calculate Pearson's correlation coefficient matrix
+    pearson_matrix = df_selected_years.corr(method='pearson')
+
+    # Return the summary statistics, correlation matrix, covariance matrix,  
+    # Spearman's rank correlation coefficient matrix, Kendall's rank 
+    # correlation coefficient matrix, and Pearson's correlation coefficient 
+    # matrix
+    return summary, corr_matrix, cov_matrix, spearman_matrix, kendall_matrix,\
+        pearson_matrix
 
 
 
