@@ -435,6 +435,64 @@ def plot_decade_comparison(df, countries, decades):
     # show the plot
     plt.show()
 
+def plot_indicators(countries, indicator1, indicator2):
+    """
+    Creates a bar plot comparing two indicators for selected countries from 
+    2017 to 2021.
+    
+    Parameters:
+    -----------
+    countries: list of str
+        List of country names to be included in the plot
+    indicator1: str
+        Name of the first indicator
+    indicator2: str
+        Name of the second indicator
+    
+    Returns:
+    --------
+    None
+    """
+    
+    # select data for the given indicators and countries for the years 
+    # 2017-2021
+    df_indicator1 = df_years.loc['2017':'2021', (countries, indicator1)]
+    df_indicator2 = df_years.loc['2017':'2021', (countries, indicator2)]
+
+    # Drop indicator column header from the dataframes
+    df_indicator1.columns = df_indicator1.columns.droplevel(1)
+    df_indicator2.columns = df_indicator2.columns.droplevel(1)
+
+    # take mean of the data for each country from 2017 to 2021
+    df_indicator1_mean = df_indicator1.mean()
+    df_indicator2_mean = df_indicator2.mean()
+
+    # create a new dataframe with mean values for each country
+    df = pd.concat([df_indicator1_mean, df_indicator2_mean], axis=1, \
+                   keys=[indicator1, indicator2])
+
+    # create bar plot
+    fig, ax = plt.subplots(figsize=(14, 8))
+    x = np.arange(len(countries))
+    width = 0.35
+    ax.bar(x - width/2, df[indicator1], width, label=indicator1)
+    ax.bar(x + width/2, df[indicator2], width, label=indicator2)
+    
+    # set the title and labels
+    ax.set_title("Terrestrial and Marine protected areas vs Urban population \
+                 by Country (2017-2021)", fontsize=20)
+    ax.set_xlabel('Country', fontsize=16)
+    ax.set_ylabel('Percentage %', fontsize=16)
+    ax.set_xticks(x)
+    ax.set_xticklabels(countries, rotation=90, fontsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.legend()
+    
+    # Save figure
+    plt.savefig('terre_vs_urb_pop.png', bbox_inches='tight', dpi=300)
+    
+    # show the plot
+    plt.show()
 
 
 
