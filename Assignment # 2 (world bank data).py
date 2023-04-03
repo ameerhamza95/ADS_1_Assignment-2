@@ -494,5 +494,51 @@ def plot_indicators(countries, indicator1, indicator2):
     # show the plot
     plt.show()
 
+def protected_areas_vs_urban_population(countries, indicators):
+    '''
+    Creates a scatter plot of protected areas versus urban population for the 
+    given countries and indicators.
+
+    Parameters:
+        - countries (list of str): list of country names to include in 
+        the plot
+        - indicators (list of str): list of indicator names to include in 
+        the plot
+
+    Returns:
+        - None
+    '''
+
+    # Select the data for the given countries and indicators for the years 
+    # 2017-2021
+    df_selected = df_years.loc['2017':'2021', (countries, indicators)]
+    df_selected = df_selected.mean()
+
+    # Calculate the total population of each country
+    df_pop = df_years.loc['2017':'2021', (countries, 'Urban population')]
+    populations = df_pop.mean(axis=0)
+
+    # Create a scatter plot with dot size proportional to population
+    fig, ax = plt.subplots(figsize=(8,6))
+    for country in countries:
+        x = df_selected.loc[(country, indicators[0])]
+        y = df_selected.loc[(country, indicators[1])]
+        size = populations[country]/1000000 # divide by a factor for 
+                                            # readability
+        ax.scatter(x, y, s=size, alpha=0.5, label=country)
+
+    # Set legend position to the right
+    ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+    # Set x and y axis labels and plot title
+    ax.set_xlabel(indicators[0], fontsize=16)
+    ax.set_ylabel(indicators[1], fontsize=16)
+    ax.set_title('Protected Areas by Urbanization', fontsize=20)
+    
+    # Save figure
+    plt.savefig('scatter_terre_vs_urb_pop.png', bbox_inches='tight', dpi=300)
+    
+    # show the plot
+    plt.show()
 
 
