@@ -300,6 +300,72 @@ def plot_urban_electricity(countries, colors):
     # Show the plot
     plt.show()
 
+def plot_forest_energy(countries, df_years):
+    """
+    This function plots a line graph for forest area percentage and renewable 
+    energy consumption for the selected countries over the years.
+
+    Arguments:
+
+    countries: a list of country names (strings) to plot data for
+    df_years: a pandas dataframe containing data for each year and indicator
+    
+    Returns:
+
+    None
+    """
+    
+    # select data for forest area percentage and renewable energy consumption 
+    # for selected countries
+    df_forest = df_years.loc[:, (countries, 'Forest area (% of land area)')]
+    df_renewable = df_years.loc[:, (countries, 'Renewable energy consumption \
+                                    (% of total final energy consumption)')]
+
+    # Drop indicator column header from the dataframes
+    df_forest.columns = df_forest.columns.droplevel(1)
+    df_renewable.columns = df_renewable.columns.droplevel(1)
+
+    # create a new dataframe with data for each country
+    df = pd.concat([df_forest, df_renewable], axis=1, \
+                   keys=['Forest Area', 'Renewable Energy Consumption'])
+
+    # plot line graph for each country
+    fig, ax = plt.subplots(figsize=(10, 8))
+    colors = ['blue', 'green', 'orange', 'purple']
+    for i, country in enumerate(countries):
+        df.loc[:, ('Forest Area', country)].\
+            plot(ax=ax, label=('Forest Area, ' + country), color=colors[i], \
+                 legend=True)
+        df.loc[:, ('Renewable Energy Consumption', country)].\
+            plot(ax=ax, label=('Renewable Energy, ' + country), \
+                 color=colors[i], legend=True)
+        
+        # annotate lines with labels
+        ax.annotate(('Forest Area, ' + country), \
+                    xy=(1995, df.loc[1995, ('Forest Area', country)]), \
+                        xytext=(10, 5), color=colors[i], \
+                            textcoords='offset points')
+        ax.annotate(('Renewable Energy, ' + country), \
+                    xy=(2011, df.loc[2011, \('Renewable Energy Consumption', \
+                                             country)]), xytext=(10, -3), \
+                        color=colors[i], textcoords='offset points')
+
+    # set graph properties
+    ax.set_title('Forest Area Percentage and Renewable Energy Consumption', \
+                 fontsize=20)
+    ax.set_xlabel('Year', fontsize=16)
+    ax.set_ylabel('Percentage', fontsize=16)
+    ax.grid(True)
+    
+    # move legend to the right corner
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    
+    # Save figure
+    plt.savefig('Forest_area_vs_renewable_energy.png', bbox_inches='tight', \
+                dpi=300)
+    
+    # show the plot
+    plt.show()
 
 
 
