@@ -639,8 +639,19 @@ print(kendall_matrix)
 print("\nPearson matrix:")
 print(pearson_matrix)
 
+# Calling the plot_heatmap function to display and save the heatmap
+# provided corr_matrix from world_bank_stats
+plot_heatmap(corr_matrix, title='Correlation Heatmap of Indicators')
 
+# Calling the generate_scatter_matrix function to display and save the scatter
+# matrix for three countries.
+generate_scatter_matrix(df_years, \
+                        ['China', 'United States', 'Russian Federation'], \
+                            indicators)
 
+# Calling the scatter_plot to display and save the scatter plot of population 
+# growth vs CO2 emissions per capita of the whole countries in the dataframe.
+scatter_plot(df_years)
 
 
 
