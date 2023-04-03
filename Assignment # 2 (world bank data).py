@@ -175,11 +175,12 @@ def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
     plt.show()
 
 def scatter_plot(df_years):
-    """" This function scatter_plot creates a scatter plot of the mean 
-        population growth rate (annual %) and the total CO2 emissions 
-        per capita (metric tons) for all countries in the input dataframe.
-    """"    
-        
+    """ 
+    This function scatter_plot creates a scatter plot of the mean 
+    population growth rate (annual %) and the total CO2 emissions per capita 
+    (metric tons) for all countries in the input dataframe.
+    """
+      
     # Select data for population growth and CO2 emissions per capita
     df_pop_growth = df_years.loc[:, (df_years.columns.levels[0].tolist(), \
                                      'Population growth (annual %)')]
@@ -346,7 +347,7 @@ def plot_forest_energy(countries, df_years):
                         xytext=(10, 5), color=colors[i], \
                             textcoords='offset points')
         ax.annotate(('Renewable Energy, ' + country), \
-                    xy=(2011, df.loc[2011, \('Renewable Energy Consumption', \
+                    xy=(2011, df.loc[2011, ('Renewable Energy Consumption', \
                                              country)]), xytext=(10, -3), \
                         color=colors[i], textcoords='offset points')
 
@@ -542,12 +543,13 @@ def protected_areas_vs_urban_population(countries, indicators):
     plt.show()
 
 def calculate_mean_energy_emissions(df_years, countries):
-    """" This function creates a table comparing renewable energy and CO2 
+    """
+    This function creates a table comparing renewable energy and CO2 
     emissions for selected countries for past 3 decades and save it in excel.
     
     Returns:
     Formatted table with a caption
-    """"
+    """
     
     # select data for renewable energy consumption and CO2 emissions per 
     # capita for selected countries
@@ -588,6 +590,57 @@ def calculate_mean_energy_emissions(df_years, countries):
     return display(df_mean.style.set_caption('Renewable Energy Consumption \
                                              and CO2 Emissions per Capita by \
                                                  Country and Decade'))
+
+""" Main Program """
+
+# Calling the function to read the world bank data file
+df_years, df_countries = read_world_health_data\
+    ('Data/API_19_DS2_en_excel_v2_4903056.xls')
+
+# print the dataframes extracted from the original file
+print(df_countries.head(), "\n")
+print(df_years.head(), '\n')
+
+# List of countries to consider in this analysis
+countries = ['China', 'United States', 'Russian Federation', 'Japan', \
+             'Germany', 'United Kingdom', 'France', 'Italy', 'Brazil', \
+                 'Canada', 'Korea, Rep.', 'Australia', 'Spain', 'Mexico', \
+                     'Indonesia']
+
+# List of indicators to consider in this analysis
+indicators = ['Urban population (% of total population)', 
+               'Population, total', 
+               'Population growth (annual %)', 
+               'Agriculture, forestry, and fishing, value added (% of GDP)', 
+               'Mortality rate, under-5 (per 1,000 live births)', 
+               'Terrestrial and marine protected areas \
+                   (% of total territorial area)', 
+               'Renewable energy consumption \
+                   (% of total final energy consumption)', 
+               'Access to electricity (% of population)', 
+               'Forest area (% of land area)', 
+               'CO2 emissions (metric tons per capita)']
+
+# Calling the world_health_stats function to extract the stats
+summary, corr_matrix, cov_matrix, spearman_matrix, \
+    kendall_matrix, pearson_matrix = world_health_stats(countries, indicators)
+
+# printing the stats return by world_health_stats
+print("Summary Statistics:")
+print(summary)
+print("\nCorrelation Matrix:")
+print(corr_matrix)
+print("\nCovariance Matrix:")
+print(cov_matrix)
+print("\nSpearman matrix:")
+print(spearman_matrix)
+print("\nKendall matrix:")
+print(kendall_matrix)
+print("\nPearson matrix:")
+print(pearson_matrix)
+
+
+
 
 
 
