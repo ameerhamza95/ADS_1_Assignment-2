@@ -185,8 +185,7 @@ def scatter_plot(df_years):
     df_pop_growth = df_years.loc[:, (df_years.columns.levels[0].tolist(), \
                                      'Population growth (annual %)')]
     df_co2_per_capita = df_years.loc[:, (df_years.columns.levels[0].tolist()\
-                                         , 'CO2 emissions (metric tons per \
-                                             capita)')]
+                                 , 'CO2 emissions (metric tons per capita)')]
 
     # Drop indicator column header from the dataframes
     df_co2_per_capita.columns = df_co2_per_capita.columns.droplevel(1)
@@ -238,11 +237,10 @@ def plot_urban_electricity(countries, colors):
 
     # select data for urban population percentage and access to electricity 
     # for selected countries
-    df_urban = df_years.loc[:, (countries, 'Urban population \
-                                (% of total population)')]
+    df_urban = df_years.loc[:, (countries, \
+                                'Urban population (% of total population)')]
     df_electricity = df_years.loc[1990:, (countries, \
-                                          'Access to electricity \
-                                              (% of population)')]
+                                'Access to electricity (% of population)')]
 
     # Drop indicator column header from the dataframes
     df_urban.columns = df_urban.columns.droplevel(1)
@@ -319,8 +317,8 @@ def plot_forest_energy(countries, df_years):
     # select data for forest area percentage and renewable energy consumption 
     # for selected countries
     df_forest = df_years.loc[:, (countries, 'Forest area (% of land area)')]
-    df_renewable = df_years.loc[:, (countries, 'Renewable energy consumption \
-                                    (% of total final energy consumption)')]
+    df_renewable = df_years.loc[:, (countries, \
+        'Renewable energy consumption (% of total final energy consumption)')]
 
     # Drop indicator column header from the dataframes
     df_forest.columns = df_forest.columns.droplevel(1)
@@ -384,10 +382,10 @@ def plot_decade_comparison(df, countries, decades):
     """
     # select data for mortality rate under-5 and agriculture value added 
     # percentage for selected countries
-    df_mortality = df.loc[:, (countries, 'Mortality rate, under-5 \
-                              (per 1,000 live births)')]
-    df_agriculture = df.loc[:, (countries, 'Agriculture, forestry, \
-                                and fishing, value added (% of GDP)')]
+    df_mortality = df.loc[:, (countries, \
+                        'Mortality rate, under-5 (per 1,000 live births)')]
+    df_agriculture = df.loc[:, (countries, \
+                'Agriculture, forestry, and fishing, value added (% of GDP)')]
 
     # Drop indicator column header from the dataframes
     df_mortality.columns = df_mortality.columns.droplevel(1)
@@ -481,7 +479,7 @@ def plot_indicators(countries, indicator1, indicator2):
     
     # set the title and labels
     ax.set_title("Terrestrial and Marine protected areas vs Urban population \
-                 by Country (2017-2021)", fontsize=20)
+by Country (2017-2021)", fontsize=20)
     ax.set_xlabel('Country', fontsize=16)
     ax.set_ylabel('Percentage %', fontsize=16)
     ax.set_xticks(x)
@@ -553,10 +551,10 @@ def calculate_mean_energy_emissions(df_years, countries):
     
     # select data for renewable energy consumption and CO2 emissions per 
     # capita for selected countries
-    df_renewable = df_years.loc[:, (countries, 'Renewable energy consumption \
-                                    (% of total final energy consumption)')]
-    df_emissions = df_years.loc[:, (countries, 'CO2 emissions (metric tons \
-                                    per capita)')]
+    df_renewable = df_years.loc[:, (countries, \
+        'Renewable energy consumption (% of total final energy consumption)')]
+    df_emissions = df_years.loc[:, (countries, \
+                                    'CO2 emissions (metric tons per capita)')]
 
     # Drop indicator column header from the dataframes
     df_renewable.columns = df_renewable.columns.droplevel(1)
@@ -588,8 +586,7 @@ def calculate_mean_energy_emissions(df_years, countries):
     
     # display formatted dataframe with a caption
     return display(df_mean.style.set_caption('Renewable Energy Consumption \
-                                             and CO2 Emissions per Capita by \
-                                                 Country and Decade'))
+and CO2 Emissions per Capita by Country and Decade'))
 
 """ Main Program """
 
@@ -646,12 +643,52 @@ plot_heatmap(corr_matrix, title='Correlation Heatmap of Indicators')
 # Calling the generate_scatter_matrix function to display and save the scatter
 # matrix for three countries.
 generate_scatter_matrix(df_years, \
-                        ['China', 'United States', 'Russian Federation'], \
+                       ['China', 'United States', 'Russian Federation'], \
                             indicators)
 
 # Calling the scatter_plot to display and save the scatter plot of population 
 # growth vs CO2 emissions per capita of the whole countries in the dataframe.
 scatter_plot(df_years)
+
+# Countries list to be used in plot_urban_electricity function
+countries_urb_elec = ['China', 'Brazil', 'Canada', 'Korea, Rep.', \
+                      'Australia', 'Spain', 'Mexico', 'Indonesia']
+
+# define colors for each country
+colors = {'China': 'blue', 'Brazil': 'green', 'Canada': 'orange', \
+          'Korea, Rep.': 'red', 'Australia': 'purple', 'Spain': 'brown', \
+              'Mexico': 'pink', 'Indonesia': 'gray'}
+    
+# Calling the function to plot and save urban pop and access to electricity 
+# over time
+plot_urban_electricity(countries_urb_elec, colors)
+
+# Calling the function to plot and save forest area and renewable energy 
+# consumption over time for selected countries
+plot_forest_energy(['China', 'Brazil', 'Mexico', 'Indonesia'], df_years)
+
+# Calling the function to plot and save a bar plot of mortality rate and  
+# agricultural value added vs countries for the 4 decades
+plot_decade_comparison(df_years, ['China', 'Brazil', 'Mexico', 'Indonesia'], \
+                       ['1990-1999', '2000-2009', '2010-2019', '2020-2021'])
+
+# Calling the function to plot and save terrestrial and marine protected areas 
+# vs urban population by countries
+plot_indicators(countries, 'Terrestrial and marine protected areas \
+(% of total territorial area)', 'Urban population (% of total population)')
+
+# Calling the function to scatter plot and save protected areas by urbanization
+protected_areas_vs_urban_population(countries, ['Terrestrial protected areas \
+(% of total land area)', 'Marine protected areas (% of territorial waters)'])
+
+# Calling the function to make a table for CO2 emissions and renewable energy
+# for the past 3 decades and save it in excel file
+calculate_mean_energy_emissions(df_years, countries)
+
+
+
+
+
 
 
 
