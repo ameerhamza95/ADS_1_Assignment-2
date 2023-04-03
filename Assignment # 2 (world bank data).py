@@ -541,4 +541,53 @@ def protected_areas_vs_urban_population(countries, indicators):
     # show the plot
     plt.show()
 
+def calculate_mean_energy_emissions(df_years, countries):
+    """" This function creates a table comparing renewable energy and CO2 
+    emissions for selected countries for past 3 decades and save it in excel.
+    
+    Returns:
+    Formatted table with a caption
+    """"
+    
+    # select data for renewable energy consumption and CO2 emissions per 
+    # capita for selected countries
+    df_renewable = df_years.loc[:, (countries, 'Renewable energy consumption \
+                                    (% of total final energy consumption)')]
+    df_emissions = df_years.loc[:, (countries, 'CO2 emissions (metric tons \
+                                    per capita)')]
+
+    # Drop indicator column header from the dataframes
+    df_renewable.columns = df_renewable.columns.droplevel(1)
+    df_emissions.columns = df_emissions.columns.droplevel(1)
+
+    # create a new dataframe with data for each country
+    df_combined = pd.concat([df_renewable, df_emissions], axis=1, \
+                            keys=['Renewable Energy Consumption', \
+                                  'CO2 Emissions per Capita'])
+    
+    # decades list
+    decades = ['1990-1999', '2000-2009', '2010-2019']
+
+    # calculate mean values for each decade
+    df_mean = pd.DataFrame()
+    for decade in decades:
+        start_year = int(decade.split('-')[0])
+        end_year = int(decade.split('-')[1])
+        df_decade = df_combined.loc[str(start_year):str(end_year), :]
+        df_mean[decade] = df_decade.mean()
+    
+    # reset index and set new index names for df_mean
+    df_mean = df_mean.reset_index().set_index(['Country Name', 'level_0'])\
+        .sort_index()
+    df_mean.index.names = ['Country', 'Indicators']
+    
+    # save df_mean to Excel file
+    df_mean.to_excel('df_mean.xlsx')
+    
+    # display formatted dataframe with a caption
+    return display(df_mean.style.set_caption('Renewable Energy Consumption \
+                                             and CO2 Emissions per Capita by \
+                                                 Country and Decade'))
+
+
 
