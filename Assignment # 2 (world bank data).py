@@ -187,7 +187,7 @@ def scatter_plot(df_years):
                                          , 'CO2 emissions (metric tons per \
                                              capita)')]
 
-    # Drop indicator column headers from the dataframes
+    # Drop indicator column header from the dataframes
     df_co2_per_capita.columns = df_co2_per_capita.columns.droplevel(1)
     df_pop_growth.columns = df_pop_growth.columns.droplevel(1)
 
@@ -205,12 +205,97 @@ def scatter_plot(df_years):
                      logx=False, logy=True, s=20)
 
     # Set the title, x-label, and y-label of the plot
-    ax.set_title('Population Growth vs. CO2 Emissions per Capita')
-    ax.set_xlabel('Population Growth (Annual %)')
-    ax.set_ylabel('CO2 Emissions per Capita (Metric Tons)')
+    ax.set_title('Population Growth vs. CO2 Emissions per Capita', fontsize=20)
+    ax.set_xlabel('Population Growth (Annual %)', fontsize=16)
+    ax.set_ylabel('CO2 Emissions per Capita (Metric Tons)', fontsize=16)
 
     # Show the grid lines
     ax.grid(True)
+    
+    # Save figure
+    plt.savefig('Scatter_Plot.png', bbox_inches='tight', dpi=300)
+
+    # Show the plot
+    plt.show()
+
+def plot_urban_electricity(countries, colors):
+    """
+    Plots the urban population percentage and access to electricity for 
+    selected countries over time.
+
+    Parameters:
+    -----------
+    countries: list
+        A list of country names to plot.
+    colors: dict
+        A dictionary of colors for each country.
+
+    Returns:
+    --------
+    None
+    """
+
+    # select data for urban population percentage and access to electricity 
+    # for selected countries
+    df_urban = df_years.loc[:, (countries, 'Urban population \
+                                (% of total population)')]
+    df_electricity = df_years.loc[1990:, (countries, \
+                                          'Access to electricity \
+                                              (% of population)')]
+
+    # Drop indicator column header from the dataframes
+    df_urban.columns = df_urban.columns.droplevel(1)
+    df_electricity.columns = df_electricity.columns.droplevel(1)
+
+    # create a new dataframe with data for each country
+    df = pd.concat([df_urban, df_electricity], axis=1, \
+                   keys=['Urban Population', 'Access to Electricity'])
+
+    # plot line graph for each country in the first subplot
+    fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(10, 10))
+    ax1, ax2 = axs
+    
+    # plot line graph for each country in the first subplot
+    for country in countries:
+        df.loc[:, ('Urban Population', country)].\
+            plot(ax=ax1, label=('Urban Population, ' + country), \
+                 color=colors[country], legend=True)
+        
+        # add country name annotation to lines
+        x_pos = df.index[1] 
+        y_urban = df.loc[df.index[1], ('Urban Population', country)]
+        ax1.text(x_pos, y_urban, country, color=colors[country], fontsize=10)
+    
+    # set graph properties for the first subplot
+    ax1.set_title('Urban Population Over Time', fontsize=20)
+    ax1.set_xlabel('Year', fontsize=16)
+    ax1.set_ylabel('Percentage %', fontsize=16)
+    ax1.grid(True)
+    ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # plot line graph for each country in the second subplot
+    for country in countries:
+        df.loc[:, ('Access to Electricity', country)].\
+            plot(ax=ax2, label=('Access to Electricity, ' + country), \
+                 color=colors[country], legend=True)
+        
+#         # add country name annotation to lines
+#         x_pos = df.index[1] 
+#         y_electricity = df.loc[df.index[1], ('Access to Electricity', country)]
+#         ax2.text(x_pos, y_electricity, country, color=colors[country], fontsize=10)
+    
+    # set graph properties for the second subplot
+    ax2.set_title('Access to Electricity Over Time', fontsize=20)
+    ax2.set_xlabel('Year', fontsize=16)
+    ax2.set_ylabel('Percentage %', fontsize=16)
+    ax2.grid(True)
+    ax2.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # Adjust teh vertical space
+    plt.subplots_adjust(hspace=0.5)
+    
+    # Save figure
+    plt.savefig('Urban_pop_vs_acc_to_elec.png', bbox_inches='tight', dpi=300)
 
     # Show the plot
     plt.show()
