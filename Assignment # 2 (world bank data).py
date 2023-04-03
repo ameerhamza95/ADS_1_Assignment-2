@@ -174,6 +174,47 @@ def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
     # Show the plot
     plt.show()
 
+def scatter_plot(df_years):
+    """" This function scatter_plot creates a scatter plot of the mean 
+        population growth rate (annual %) and the total CO2 emissions 
+        per capita (metric tons) for all countries in the input dataframe.
+    """"    
+        
+    # Select data for population growth and CO2 emissions per capita
+    df_pop_growth = df_years.loc[:, (df_years.columns.levels[0].tolist(), \
+                                     'Population growth (annual %)')]
+    df_co2_per_capita = df_years.loc[:, (df_years.columns.levels[0].tolist()\
+                                         , 'CO2 emissions (metric tons per \
+                                             capita)')]
+
+    # Drop indicator column headers from the dataframes
+    df_co2_per_capita.columns = df_co2_per_capita.columns.droplevel(1)
+    df_pop_growth.columns = df_pop_growth.columns.droplevel(1)
+
+    # Only keep countries that are present in both dataframes
+    df_pop_growth = df_pop_growth[df_co2_per_capita.columns.tolist()]
+
+    # Create a new dataframe with x and y data
+    df = pd.concat([df_pop_growth.mean(axis=0), \
+                    df_co2_per_capita.sum(axis=0)], axis=1, \
+                   keys=['Population Growth', 'CO2 Emissions per Capita'])
+
+    # Create a scatter plot using Pandas' plot function
+    ax = df.plot(kind='scatter', x='Population Growth', \
+                 y='CO2 Emissions per Capita', figsize=(10, 8), \
+                     logx=False, logy=True, s=20)
+
+    # Set the title, x-label, and y-label of the plot
+    ax.set_title('Population Growth vs. CO2 Emissions per Capita')
+    ax.set_xlabel('Population Growth (Annual %)')
+    ax.set_ylabel('CO2 Emissions per Capita (Metric Tons)')
+
+    # Show the grid lines
+    ax.grid(True)
+
+    # Show the plot
+    plt.show()
+
 
 
 
