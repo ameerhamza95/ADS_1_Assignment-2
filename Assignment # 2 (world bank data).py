@@ -15,46 +15,51 @@ import matplotlib.pyplot as plt
 """ Defining the functions to be used in a program """
 
 def read_world_health_data(filename):
-    """ Define a function that reads in a world health data Excel file and 
-        returns two dataframes
+    """ 
+    Define a function that reads in a world health data Excel file and 
+    returns two dataframes
     """
     
     # Read the Excel file into a Pandas dataframe, starting from the 4th row
     df = pd.read_excel(filename, header=3)
     
     # Create a copy of the original dataframe
-    df_countries = df.copy()
+    df_countries_data = df.copy()
 
     # Set the index of the dataframe to be a multiindex with 'Country Name' as 
     # the first level and 'Indicator Name' as the second level
-    df_countries.set_index(['Country Name', 'Indicator Name'], inplace=True)
+    df_countries_data.set_index(['Country Name', 'Indicator Name'], \
+                                inplace=True)
     
     # Drop the 'Country Code' and 'Indicator Code' columns
-    df_countries.drop(['Country Code', 'Indicator Code'], axis=1, inplace=True)
+    df_countries_data.drop(['Country Code', 'Indicator Code'], axis=1, \
+                           inplace=True)
     
     # Rename the column levels to 'Years'
-    df_countries.columns.names = ['Years']
+    df_countries_data.columns.names = ['Years']
 
     # Convert the column headers to datetime format
-    df_countries.columns = pd.to_datetime(df_countries.columns, format='%Y')
+    df_countries_data.columns = pd.to_datetime(df_countries_data.columns, \
+                                               format='%Y')
     
     # Extract the year component from the datetime column
-    df_countries.columns = df_countries.columns.year
+    df_countries_data.columns = df_countries_data.columns.year
     
     # Drop rows and columns with all NaN values
-    df_countries = df_countries.dropna(axis=0, how='all')
-    df_countries = df_countries.dropna(axis=1, how='all')
+    df_countries_data = df_countries_data.dropna(axis=0, how='all')
+    df_countries_data = df_countries_data.dropna(axis=1, how='all')
     
     # Transpose the dataframe to get years as columns
-    df_years = df_countries.transpose().copy()
+    df_years_data = df_countries_data.transpose().copy()
 
     # Return both dataframes
-    return df_years, df_countries
+    return df_years_data, df_countries_data
 
 def world_health_stats(countries, indicators):
-    """ This function, world_health_stats, takes in two parameters, countries 
-        and indicators, and performs various statistical calculations on the 
-        world health data.
+    """ 
+    This function, world_health_stats, takes in two parameters, countries 
+    and indicators, and performs various statistical calculations on the 
+    world health data.
     """
 
     # Subset the data for selected countries and indicators
@@ -63,37 +68,37 @@ def world_health_stats(countries, indicators):
     df_selected_countries = df_countries.loc[(countries, indicators), :]
 
     # Calculate summary statistics for each indicator
-    summary = df_selected_years.describe()
+    summary_stats = df_selected_years.describe()
 
     # Calculate correlation matrix
-    corr_matrix = df_selected_years.corr()
+    corr_matrix_stats = df_selected_years.corr()
 
     # Calculate covariance matrix
-    cov_matrix = df_selected_years.cov()
+    cov_matrix_stats = df_selected_years.cov()
 
     # Calculate Spearman's rank correlation coefficient matrix
-    spearman_matrix = df_selected_years.corr(method='spearman')
+    spearman_matrix_stats = df_selected_years.corr(method='spearman')
 
     # Calculate Kendall's rank correlation coefficient matrix
-    kendall_matrix = df_selected_years.corr(method='kendall')
+    kendall_matrix_stats = df_selected_years.corr(method='kendall')
 
     # Calculate Pearson's correlation coefficient matrix
-    pearson_matrix = df_selected_years.corr(method='pearson')
+    pearson_matrix_stats = df_selected_years.corr(method='pearson')
 
     # Return the summary statistics, correlation matrix, covariance matrix,  
     # Spearman's rank correlation coefficient matrix, Kendall's rank 
     # correlation coefficient matrix, and Pearson's correlation coefficient 
     # matrix
-    return summary, corr_matrix, cov_matrix, spearman_matrix, kendall_matrix,\
-        pearson_matrix
+    return summary_stats, corr_matrix_stats, cov_matrix_stats, \
+        spearman_matrix_stats, kendall_matrix_stats, pearson_matrix_stats
 
-def plot_heatmap(corr_matrix, title='Correlation Heatmap', figsize=(50,50), \
+def plot_heatmap(corr, title='Correlation Heatmap', figsize=(50,50), \
                  fontsize=16):
     """
     Generate a heatmap from a given correlation matrix using seaborn library
 
     Parameters:
-    corr_matrix (pd.DataFrame): A correlation matrix of indicators
+    corr (pd.DataFrame): A correlation matrix of indicators
     title (str): Title for the heatmap (default is 'Correlation Heatmap')
     figsize (tuple): Figure size of the heatmap (default is (50, 50))
     fontsize (int): Font size of the labels (default is 16)
@@ -107,7 +112,7 @@ def plot_heatmap(corr_matrix, title='Correlation Heatmap', figsize=(50,50), \
     plt.figure(figsize=figsize)
 
     # Generate heatmap
-    heatmap = sns.heatmap(corr_matrix, cmap='coolwarm', annot=True, \
+    heatmap = sns.heatmap(corr, cmap='coolwarm', annot=True, \
                           fmt='.2f', annot_kws={"size": fontsize-10})
 
     # Set x and y label font size and rotation
@@ -125,7 +130,7 @@ def plot_heatmap(corr_matrix, title='Correlation Heatmap', figsize=(50,50), \
     # Show the plot
     plt.show()
 
-def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
+def generate_scatter_matrix(df, countries, indicators, figsize=(15, 15)):
     """
     Generate a scatter plot matrix for the specified countries and indicators.
     
@@ -145,7 +150,7 @@ def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
     """
     
     # Select data for the specified countries and indicators
-    df_selected_years = df_years.loc[:, (countries, indicators)] 
+    df_selected_years = df.loc[:, (countries, indicators)] 
 
     # Create scatter plot matrix
     scatter_matrix = pd.plotting.scatter_matrix(df_selected_years, \
@@ -174,7 +179,7 @@ def generate_scatter_matrix(df_years, countries, indicators, figsize=(15, 15)):
     # Show the plot
     plt.show()
 
-def scatter_plot(df_years):
+def scatter_plot(df_year):
     """ 
     This function scatter_plot creates a scatter plot of the mean 
     population growth rate (annual %) and the total CO2 emissions per capita 
@@ -182,9 +187,9 @@ def scatter_plot(df_years):
     """
       
     # Select data for population growth and CO2 emissions per capita
-    df_pop_growth = df_years.loc[:, (df_years.columns.levels[0].tolist(), \
+    df_pop_growth = df_year.loc[:, (df_year.columns.levels[0].tolist(), \
                                      'Population growth (annual %)')]
-    df_co2_per_capita = df_years.loc[:, (df_years.columns.levels[0].tolist()\
+    df_co2_per_capita = df_year.loc[:, (df_year.columns.levels[0].tolist()\
                                  , 'CO2 emissions (metric tons per capita)')]
 
     # Drop indicator column header from the dataframes
@@ -280,8 +285,10 @@ def plot_urban_electricity(countries, colors):
         
 #         # add country name annotation to lines
 #         x_pos = df.index[1] 
-#         y_electricity = df.loc[df.index[1], ('Access to Electricity', country)]
-#         ax2.text(x_pos, y_electricity, country, color=colors[country], fontsize=10)
+#         y_electricity = df.loc[df.index[1], ('Access to Electricity', \
+#                                                country)]
+#         ax2.text(x_pos, y_electricity, country, color=colors[country], \
+#                                                           fontsize=10)
     
     # set graph properties for the second subplot
     ax2.set_title('Access to Electricity Over Time', fontsize=20)
@@ -299,7 +306,7 @@ def plot_urban_electricity(countries, colors):
     # Show the plot
     plt.show()
 
-def plot_forest_energy(countries, df_years):
+def plot_forest_energy(countries, df_year):
     """
     This function plots a line graph for forest area percentage and renewable 
     energy consumption for the selected countries over the years.
@@ -307,7 +314,7 @@ def plot_forest_energy(countries, df_years):
     Arguments:
 
     countries: a list of country names (strings) to plot data for
-    df_years: a pandas dataframe containing data for each year and indicator
+    df_year: a pandas dataframe containing data for each year and indicator
     
     Returns:
 
@@ -316,8 +323,8 @@ def plot_forest_energy(countries, df_years):
     
     # select data for forest area percentage and renewable energy consumption 
     # for selected countries
-    df_forest = df_years.loc[:, (countries, 'Forest area (% of land area)')]
-    df_renewable = df_years.loc[:, (countries, \
+    df_forest = df_year.loc[:, (countries, 'Forest area (% of land area)')]
+    df_renewable = df_year.loc[:, (countries, \
         'Renewable energy consumption (% of total final energy consumption)')]
 
     # Drop indicator column header from the dataframes
@@ -540,7 +547,7 @@ def protected_areas_vs_urban_population(countries, indicators):
     # show the plot
     plt.show()
 
-def calculate_mean_energy_emissions(df_years, countries):
+def calculate_mean_energy_emissions(df_year, countries):
     """
     This function creates a table comparing renewable energy and CO2 
     emissions for selected countries for past 3 decades and save it in excel.
@@ -551,9 +558,9 @@ def calculate_mean_energy_emissions(df_years, countries):
     
     # select data for renewable energy consumption and CO2 emissions per 
     # capita for selected countries
-    df_renewable = df_years.loc[:, (countries, \
+    df_renewable = df_year.loc[:, (countries, \
         'Renewable energy consumption (% of total final energy consumption)')]
-    df_emissions = df_years.loc[:, (countries, \
+    df_emissions = df_year.loc[:, (countries, \
                                     'CO2 emissions (metric tons per capita)')]
 
     # Drop indicator column header from the dataframes
@@ -582,11 +589,13 @@ def calculate_mean_energy_emissions(df_years, countries):
     df_mean.index.names = ['Country', 'Indicators']
     
     # save df_mean to Excel file
-    df_mean.to_excel('df_mean.xlsx')
+    df_mean.to_excel('Renewable Energy vs CO2 Emissions.xlsx')
     
     # display formatted dataframe with a caption
-    return display(df_mean.style.set_caption('Renewable Energy Consumption \
-and CO2 Emissions per Capita by Country and Decade'))
+    print(f"\n{'Renewable Energy Consumption and CO2 Emissions per Capita'}\n")
+    
+    # Return to print the dataframe
+    return print(df_mean)
 
 """ Main Program """
 
@@ -599,13 +608,13 @@ print(df_countries.head(), "\n")
 print(df_years.head(), '\n')
 
 # List of countries to consider in this analysis
-countries = ['China', 'United States', 'Russian Federation', 'Japan', \
+countries_list = ['China', 'United States', 'Russian Federation', 'Japan', \
              'Germany', 'United Kingdom', 'France', 'Italy', 'Brazil', \
                  'Canada', 'Korea, Rep.', 'Australia', 'Spain', 'Mexico', \
                      'Indonesia']
 
 # List of indicators to consider in this analysis
-indicators = ['Urban population (% of total population)', 
+indicators_list = ['Urban population (% of total population)', 
                'Population, total', 
                'Population growth (annual %)', 
                'Agriculture, forestry, and fishing, value added (% of GDP)', 
@@ -620,7 +629,8 @@ indicators = ['Urban population (% of total population)',
 
 # Calling the world_health_stats function to extract the stats
 summary, corr_matrix, cov_matrix, spearman_matrix, \
-    kendall_matrix, pearson_matrix = world_health_stats(countries, indicators)
+    kendall_matrix, pearson_matrix = world_health_stats(countries_list, \
+                                                        indicators_list)
 
 # printing the stats return by world_health_stats
 print("Summary Statistics:")
@@ -639,56 +649,50 @@ print(pearson_matrix)
 # Calling the plot_heatmap function to display and save the heatmap
 # provided corr_matrix from world_bank_stats
 plot_heatmap(corr_matrix, title='Correlation Heatmap of Indicators')
-
+ 
 # Calling the generate_scatter_matrix function to display and save the scatter
 # matrix for three countries.
 generate_scatter_matrix(df_years, \
-                       ['China', 'United States', 'Russian Federation'], \
-                            indicators)
-
+                        ['China', 'United States', 'Russian Federation'], \
+                            indicators_list)
+ 
 # Calling the scatter_plot to display and save the scatter plot of population 
 # growth vs CO2 emissions per capita of the whole countries in the dataframe.
 scatter_plot(df_years)
-
+ 
 # Countries list to be used in plot_urban_electricity function
 countries_urb_elec = ['China', 'Brazil', 'Canada', 'Korea, Rep.', \
-                      'Australia', 'Spain', 'Mexico', 'Indonesia']
-
+                       'Australia', 'Spain', 'Mexico', 'Indonesia']
+ 
 # define colors for each country
-colors = {'China': 'blue', 'Brazil': 'green', 'Canada': 'orange', \
-          'Korea, Rep.': 'red', 'Australia': 'purple', 'Spain': 'brown', \
-              'Mexico': 'pink', 'Indonesia': 'gray'}
-    
+colors_dict = {'China': 'blue', 'Brazil': 'green', 'Canada': 'orange', \
+           'Korea, Rep.': 'red', 'Australia': 'purple', 'Spain': 'brown', \
+               'Mexico': 'pink', 'Indonesia': 'gray'}
+     
 # Calling the function to plot and save urban pop and access to electricity 
 # over time
-plot_urban_electricity(countries_urb_elec, colors)
+plot_urban_electricity(countries_urb_elec, colors_dict)
 
 # Calling the function to plot and save forest area and renewable energy 
 # consumption over time for selected countries
 plot_forest_energy(['China', 'Brazil', 'Mexico', 'Indonesia'], df_years)
-
+ 
 # Calling the function to plot and save a bar plot of mortality rate and  
 # agricultural value added vs countries for the 4 decades
 plot_decade_comparison(df_years, ['China', 'Brazil', 'Mexico', 'Indonesia'], \
-                       ['1990-1999', '2000-2009', '2010-2019', '2020-2021'])
-
+                        ['1990-1999', '2000-2009', '2010-2019', '2020-2021'])
+ 
 # Calling the function to plot and save terrestrial and marine protected areas 
 # vs urban population by countries
-plot_indicators(countries, 'Terrestrial and marine protected areas \
+plot_indicators(countries_list, 'Terrestrial and marine protected areas \
 (% of total territorial area)', 'Urban population (% of total population)')
-
+ 
 # Calling the function to scatter plot and save protected areas by urbanization
-protected_areas_vs_urban_population(countries, ['Terrestrial protected areas \
-(% of total land area)', 'Marine protected areas (% of territorial waters)'])
-
+protected_areas_vs_urban_population(countries_list, \
+['Terrestrial protected areas (% of total land area)', \
+'Marine protected areas (% of territorial waters)'])
+ 
 # Calling the function to make a table for CO2 emissions and renewable energy
 # for the past 3 decades and save it in excel file
-calculate_mean_energy_emissions(df_years, countries)
-
-
-
-
-
-
-
-
+calculate_mean_energy_emissions(df_years, countries_list)
+print("\n")
